@@ -60,3 +60,4 @@ keyboard.add_hotkey('L', next_states)
 keyboard.add_hotkey('S', move_stack)
 
 keyboard.wait('esc')
+

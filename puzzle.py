@@ -1,13 +1,12 @@
-
-
-
-
+from collections import deque
+from copy import deepcopy
 from square import Square
-
+from algorithms import Bfs
+from algorithms import Dfs
 
 class Board :
 
-    def __init__ (self,array=None):
+    def __init__ (self,array=None,parent=None, move_name="Initial",move=None):
         puzzle1 = [
         [ Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1")],
         [ Square("1"), Square("R", False, "red"), Square("0"), Square("r", True, "red"), Square("1"), Square("1"), Square("1")],
@@ -53,11 +52,20 @@ class Board :
            [Square("1"), Square("r", True, "red"), Square("0"), Square("R", False, "red"), Square("0"), Square("0"), Square("0"), Square("1")],
          [Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1")]
                             ]
+        puzzle7 = [
+           [Square("1"),Square("1"),Square("1"),Square("1"),Square("1"),],
+           [Square("1"),Square("0"),Square("0"),Square("0"),Square("1"),],
+           [Square("1"),Square("0"),Square("0"),Square("B",False,"blue"),Square("1"),],
+           [Square("1"),Square("0"),Square("b",True,"blue"),Square("0"),Square("1"),],
+          [Square("1"),Square("1"),Square("1"),Square("1"),Square("1")] 
+                     ]
 
 
         self.stack = []
-        self.array = array if array is not None else puzzle6
-        
+        self.array = array if array is not None else puzzle4
+        self.parent=parent
+        self.move_name= move_name
+        self.move=move
         
 #طباعة الرقعة
     def print_board(self):
@@ -68,13 +76,9 @@ class Board :
 
 
     
-
     def copy(self):
-        new_array = []
-        for row in self.array:
-          new_row = [square.copy() for square in row]  
-          new_array.append(new_row)
-        return Board(new_array)
+         return Board(deepcopy(self.array), parent=self)
+
 
     
             #جهة اليمين
@@ -117,13 +121,13 @@ class Board :
                         if self.goal_right(row,i):
                          row[i+1].color = '0'
                          row[i].color='0'
-
+                        self.reset_moves()
                         
                      
-                self.reset_moves()
+                # self.reset_moves()
                 self.stack.append(self.copy())
                 new_array = [[square.copy() for square in row] for row in self.array]
-                new_board = Board(new_array)
+                new_board = Board(new_array, parent=self)
                 return new_board
 
                        
@@ -179,8 +183,8 @@ class Board :
      for row in self.array:
        new_row = [square.copy() for square in row]  
        new_array.append(new_row)
-     new_borad=Board(new_array)
-     return new_borad
+       new_board = Board(new_array, parent=self)
+     return new_board
      
     
       # جهة الأعلى
@@ -229,8 +233,8 @@ class Board :
         for row in self.array:
           new_row = [square.copy() for square in row]  
           new_array.append(new_row)
-        new_borad=Board(new_array)
-        return new_borad
+        new_board = Board(new_array, parent=self)
+        return new_board
    
 # جهة الأسفل
     def check_down(self, row, col):
@@ -279,8 +283,8 @@ class Board :
         for row in self.array:
           new_row = [square.copy() for square in row]  
         new_array.append(new_row)
-        new_borad=Board(new_array)
-        return new_borad
+        new_board = Board(new_array, parent=self) 
+        return new_board
     
 
 
@@ -331,5 +335,13 @@ class Board :
         else:
          print("not winner")
         return all_won
+    
+    # BFS
+    def solve_bfs(self):
+        return Bfs(self)
 
+    # DFS
+    def solve_dfs(self):
+        return Dfs(self)
 
+  

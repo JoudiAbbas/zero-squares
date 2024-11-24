@@ -15,7 +15,7 @@ def Dfs(board):
         visited.add(board_state)
         visited_count += 1
 
-        print(f"{visited_count}: {move_name}")
+        print(f"{visited_count}:{move_name}")
         current_board.print_board()
 
         if current_board.check_win():
@@ -28,7 +28,7 @@ def Dfs(board):
                     move_name = current_board.move_name
             solution_path.reverse()
             for step, (board, move) in enumerate(solution_path):
-                print(f"Step {step} {move}:")
+                print(f"{step}:{move}")
                 board.print_board()
             print(f"💡 Total boards visited: {visited_count}")
             print(f"🎯 Total Steps in Solution : {len(solution_path) - 1}")
@@ -58,7 +58,7 @@ def Bfs(board):
      while queue:
         current_board, move_name = queue.popleft()
         visited_count += 1
-        print(f"{visited_count}: {move_name}")
+        print(f"{visited_count}:{move_name}")
         current_board.print_board()
 
 
@@ -72,7 +72,7 @@ def Bfs(board):
             solution_path.reverse()
 
             for step, (board, move) in enumerate(solution_path):
-                print(f"Step {step}:{move}")
+                print(f"{step}:{move}")
                 board.print_board()
             print(f"💡 Total boards visited: {visited_count}")
             print(f"🎯 Total Steps in Solution : {len(solution_path) - 1}")

@@ -2,13 +2,15 @@ from collections import deque
 from copy import deepcopy
 from square import Square
 from algorithms import Bfs
-# from algorithms import Dfs
-from DFS_r import Dfs_recursive 
+from algorithms import Dfs
+from UCS import ucs
+# from DFS_r import Dfs_recursive 
+import heapq
 
 
 class Board :
 
-    def __init__ (self,array=None,parent=None, move_name="Initial",move=None):
+    def __init__ (self,array=None,parent=None, move_name="Initial",move=None,cost=0):
         puzzle1 = [
         [ Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1"), Square("1")],
         [ Square("1"), Square("r", True, "red"), Square("0"), Square("0"), Square("R", False, "red"), Square("1"), Square("1")],
@@ -71,10 +73,11 @@ class Board :
 
 
         self.stack = []
-        self.array = array if array is not None else puzzle3
+        self.array = array if array is not None else puzzle8
         self.parent=parent
         self.move_name= move_name
         self.move=move
+        self.cost=cost
         
 #طباعة الرقعة
     def print_board(self):
@@ -110,6 +113,7 @@ class Board :
     
     
     def move_right(self):
+    
      movable_squares = []
      for row in self.array:
         for i, square in enumerate(row):
@@ -127,15 +131,18 @@ class Board :
             row[i+1].color = row[i].color
             row[i+1].can_move = True
             row[i+1].color_goal = row[i].color_goal
+            self.cost+=1
 
             if row[i].is_temp_occupied:
                row[i].color = row[i].original_color
                row[i].color_goal = row[i].original_color_goal
                row[i].is_temp_occupied = False
+               
             else:
                 row[i].color = '0'
                 row[i].can_move = False
                 row[i].color_goal = None
+                
 
             i += 1
 
@@ -146,15 +153,17 @@ class Board :
                 if row[i].is_goal:
                     row[i].color = row[i].original_color
                     row[i].color_goal = row[i].original_color_goal
+                    self.cost+=1
                 else:
                     row[i].color = '0'
+                    self.cost+=1
                    
-
+     
      self.reset_moves()
      self.stack.append(self.copy())
      new_array = [[square.copy() for square in row] for row in self.array]
      new_board = Board(new_array, parent=self)
-     return new_board
+     return new_board, new_board.cost 
     
 
 
@@ -200,6 +209,7 @@ class Board :
             row[i-1].color = row[i].color
             row[i-1].can_move = True
             row[i-1].color_goal = row[i].color_goal
+            self.cost+=1
             if row[i].is_temp_occupied:
                row[i].color = row[i].original_color
                row[i].color_goal = row[i].original_color_goal
@@ -213,13 +223,14 @@ class Board :
      for row in self.array:
         for i in range(len(row)-1,0,-1):      
             if self.goal_left(row,i):
+                       self.cost+=1
                        row[i-1].color = '0'
                        if row[i].is_goal:
                         row[i].color = row[i].original_color
                         row[i].color_goal = row[i].original_color_goal
                        else:
                         row[i].color = '0'
-                   
+                       
      self.reset_moves()
      self.stack.append(self.copy())
      new_array = []
@@ -227,7 +238,7 @@ class Board :
        new_row = [square.copy() for square in row]  
        new_array.append(new_row)
        new_board = Board(new_array, parent=self)
-     return new_board
+     return new_board, new_board.cost
      
 
     
@@ -268,6 +279,7 @@ class Board :
              self.array[i-1][j].color = self.array[i][j].color
              self.array[i-1][j].can_move = True
              self.array[i-1][j].color_goal = self.array[i][j].color_goal
+             self.cost+=1
              if self.array[i][j].is_temp_occupied:
                self.array[i][j].color = self.array[i][j].original_color
                self.array[i][j].color_goal =self.array[i][j].original_color_goal
@@ -282,6 +294,7 @@ class Board :
         for j in range(len(self.array[0])): 
           for i in range(len(self.array)- 1,0,-1):
             if self.goal_up(i,j):
+                self.cost+=1
                 self.array[i-1][j].color = '0'
                 if self.array[i][j].is_goal:
                    self.array[i][j].color = self.array[i-1][j].original_color
@@ -296,7 +309,7 @@ class Board :
           new_row = [square.copy() for square in row]  
           new_array.append(new_row)
         new_board = Board(new_array, parent=self)
-        return new_board
+        return new_board,new_board.cost
    
 
 
@@ -336,6 +349,7 @@ class Board :
             self.array[i+1][j].color = self.array[i][j].color
             self.array[i+1][j].can_move = True
             self.array[i+1][j].color_goal = self.array[i][j].color_goal
+            self.cost+=1
             if self.array[i][j].is_temp_occupied:
                self.array[i][j].color = self.array[i][j].original_color
                self.array[i][j].color_goal =self.array[i][j].original_color_goal
@@ -349,6 +363,7 @@ class Board :
         for j in range(len(self.array[0])):  
           for i in range(len(self.array) -1):  
                 if self.goal_down(i,j):
+                       self.cost+=1
                        self.array[i +1][j].color = '0'
                        if self.array[i][j].is_goal:
                         self.array[i][j].color = self.array[i+1][j].original_color
@@ -364,7 +379,7 @@ class Board :
           new_row = [square.copy() for square in row]  
         new_array.append(new_row)
         new_board = Board(new_array, parent=self) 
-        return new_board
+        return new_board,new_board.cost
     
 
 
@@ -382,19 +397,19 @@ class Board :
 
         right_board = self.copy()
         right_board.move_right()
-        next_states.append(("right",right_board))
+        next_states.append(("right",right_board,right_board.cost))
 
         left_board = self.copy()
         left_board.move_left()
-        next_states.append(("left",left_board))
+        next_states.append(("left",left_board,left_board.cost))
 
         up_board = self.copy()
         up_board.move_up()
-        next_states.append(("up", up_board))
+        next_states.append(("up", up_board,up_board.cost))
 
         down_board = self.copy()
         down_board.move_down()
-        next_states.append(("down",down_board))
+        next_states.append(("down",down_board,down_board.cost))
 
         return next_states
     
@@ -423,6 +438,17 @@ class Board :
 
     # DFS
     def solve_dfs(self):
-        return Dfs_recursive(self)
+        return Dfs(self)
+    
+    # UCS
+    def solve_ucs(self):
+        return ucs(self)
+   
+    
 
- 
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+    def __eq__(self, other):
+        return self.cost == other.cost
+    

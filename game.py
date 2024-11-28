@@ -41,9 +41,10 @@ def move_down():
 
 def next_states():
     possible_state = board1.Next_state()
-    for direction, board in possible_state:
+    for direction, board,cost in possible_state:
      print(f"move {direction}")
      board.print_board()
+     print(cost)
      print("--------")
 
 def move_stack():

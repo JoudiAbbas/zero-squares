@@ -43,9 +43,6 @@ def Dfs(board):
      print(f"Total boards visited: {visited_count}")
      return None
 
-
-
-
 # BFS
 def Bfs(board):
      queue = deque([(board,"Initial_Board")]) 

@@ -2,7 +2,8 @@ from collections import deque
 from copy import deepcopy
 from square import Square
 from algorithms import Bfs
-from DFS_r import Dfs
+# from algorithms import Dfs
+from DFS_r import Dfs_recursive 
 
 
 class Board :
@@ -70,7 +71,7 @@ class Board :
 
 
         self.stack = []
-        self.array = array if array is not None else puzzle1
+        self.array = array if array is not None else puzzle3
         self.parent=parent
         self.move_name= move_name
         self.move=move
@@ -422,6 +423,6 @@ class Board :
 
     # DFS
     def solve_dfs(self):
-        return Dfs(self)
+        return Dfs_recursive(self)
 
  
